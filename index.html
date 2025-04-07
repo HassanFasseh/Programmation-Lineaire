@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Programmation linéaire</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background: #f4f4f4;
+    }
+    h1, h2, h3, h4 {
+      color: #333;
+    }
+    form {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 5px;
+      margin-bottom: 2rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.3rem;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.7rem 1.5rem;
+      border: none;
+      border-radius: 3px;
+      background-color: #007BFF;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #result img {
+      max-width: 100%;
+      height: auto;
+      border: 1px solid #ccc;
+      margin-top: 1rem;
+    }
+    pre {
+      background: #eee;
+      padding: 0.5rem;
+      border-radius: 3px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Programmation linéaire</h1>
+  <form id="lpForm">
+    <label for="objective">Objective Coefficients (comma-separated):</label>
+    <input type="text" id="objective" name="objective" placeholder="e.g. 3,5" required />
+
+    <label for="constraints">Constraint Matrix (each row on new line, comma-separated):</label>
+    <textarea id="constraints" name="constraints" rows="5" placeholder="e.g. 1,2&#10;3,4" required></textarea>
+
+    <label for="rhs">RHS Values (comma-separated):</label>
+    <input type="text" id="rhs" name="rhs" placeholder="e.g. 5,11" required />
+
+    <label for="variable_bounds">
+      Variable Bounds (optional, one per variable as lower-upper; use empty for no bound, separate bounds with commas):
+      <br /><small>Example: <code>0-,0-</code> means x ≥ 0 and y ≥ 0</small>
+    </label>
+    <input type="text" id="variable_bounds" name="variable_bounds" placeholder="e.g. 0-,0-" />
+
+    <label for="method">Method:</label>
+    <select id="method" name="method">
+      <option value="graphique">Graphical</option>
+      <option value="simplexe">Simplex</option>
+    </select>
+
+    <label for="maximize">Maximize:</label>
+    <input type="checkbox" id="maximize" name="maximize" checked />
+
+    <button type="submit">Solve</button>
+  </form>
+
+  <div id="result"></div>
+
+  <script>
+    document.getElementById('lpForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      
+      // Get input values
+      const objectiveInput = document.getElementById('objective').value;
+      const constraintsInput = document.getElementById('constraints').value;
+      const rhsInput = document.getElementById('rhs').value;
+      const boundsInput = document.getElementById('variable_bounds').value;
+      const method = document.getElementById('method').value;
+      const maximize = document.getElementById('maximize').checked;
+      
+      // Parse objective coefficients (e.g., "3,5")
+      const objectiveCoefficients = objectiveInput.split(',').map(Number);
+      
+      // Parse constraint matrix (each row is separated by a newline, columns by commas)
+      const constraintMatrix = constraintsInput.split('\n')
+        .filter(line => line.trim() !== "")
+        .map(line => line.split(',').map(Number));
+      
+      // Parse RHS values (e.g., "5,11")
+      const rhsValues = rhsInput.split(',').map(Number);
+      
+      // Parse variable bounds if provided (format: lower-upper, e.g., "0-,0-")
+      let variable_bounds = null;
+      if (boundsInput.trim() !== "") {
+        variable_bounds = boundsInput.split(',').map(function (boundStr) {
+          const parts = boundStr.split('-');
+          const lower = parts[0] === "" ? null : Number(parts[0]);
+          const upper = parts[1] === "" ? null : Number(parts[1]);
+          return [lower, upper];
+        });
+      }
+      
+      // Build the payload object
+      const payload = {
+        objective_coefficients: objectiveCoefficients,
+        constraint_matrix: constraintMatrix,
+        rhs_values: rhsValues,
+        variable_bounds: variable_bounds,
+        method: method,
+        maximize: maximize
+      };
+      
+      try {
+        const response = await fetch('/optimize', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+        
+        const resultDiv = document.getElementById('result');
+        if (!response.ok) {
+          const errorData = await response.json();
+          resultDiv.innerHTML = `<p style="color:red;">Error: ${errorData.detail}</p>`;
+          return;
+        }
+        
+        const data = await response.json();
+        let html = `<h2>Status: ${data.status}</h2>`;
+        
+        // For the graphical method, display plot and vertices if available
+        if (data.plot) {
+          html += `<h3>Plot:</h3>
+                   <img src="data:image/png;base64,${data.plot}" alt="Plot" />`;
+        }
+        
+        if (data.vertices) {
+          html += `<h3>Vertices:</h3>
+                   <ul>`;
+          data.vertices.forEach(vertex => {
+            html += `<li>x: ${vertex.x}, y: ${vertex.y}, Objective: ${vertex.objective_value}${vertex.is_optimal ? " (Optimal)" : ""}</li>`;
+          });
+          html += `</ul>`;
+        }
+        
+        // For the simplex method, display the solution and steps if available
+        if (data.solution) {
+          html += `<h3>Simplex Solution:</h3>
+                   <p>Variables: ${data.solution.variables.join(', ')}</p>
+                   <p>Optimal Value: ${data.solution.value}</p>`;
+        }
+        
+        if (data.steps) {
+          html += `<h3>Simplex Steps:</h3>`;
+          data.steps.forEach((step, index) => {
+            html += `<h4>Step ${index}</h4>
+                     <pre>${JSON.stringify(step.tableau, null, 2)}</pre>`;
+          });
+        }
+        
+        resultDiv.innerHTML = html;
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+  </script>
+</body>
+</html>
