@@ -3,193 +3,838 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Programmation linéaire</title>
+  <title>Programmation Linéaire - Optimisation</title>
   <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #6b7280;
+      --success: #059669;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --light: #f9fafb;
+      --dark: #1f2937;
+      --white: #ffffff;
+      --border: #e5e7eb;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
-      margin: 2rem;
-      background: #f4f4f4;
-    }
-    h1, h2, h3, h4 {
-      color: #333;
-    }
-    form {
-      background: #fff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: var(--light);
       padding: 1rem;
-      border-radius: 5px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    
+    header {
       margin-bottom: 2rem;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
     }
-    label {
+    
+    h1 {
+      color: var(--primary);
+      font-size: 2.25rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .subtitle {
+      color: var(--secondary);
+      font-size: 1.125rem;
+    }
+    
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    
+    @media (min-width: 768px) {
+      .two-column {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    
+    .card {
+      background: var(--white);
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px var(--shadow);
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    
+    .card-header {
+      background-color: var(--primary);
+      color: var(--white);
+      padding: 1rem 1.5rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .card-header-alt {
+      background-color: var(--secondary);
+    }
+    
+    .card-body {
+      padding: 1.5rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    
+    .form-label {
       display: block;
-      margin-top: 1rem;
-      font-weight: bold;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--dark);
     }
-    input[type="text"],
-    textarea,
-    select {
+    
+    .form-help {
+      display: block;
+      margin-top: 0.25rem;
+      font-size: 0.875rem;
+      color: var(--secondary);
+    }
+    
+    .form-control {
       width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.3rem;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-    }
-    button {
-      margin-top: 1rem;
-      padding: 0.7rem 1.5rem;
-      border: none;
-      border-radius: 3px;
-      background-color: #007BFF;
-      color: white;
+      padding: 0.75rem;
       font-size: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 0.375rem;
+      transition: border-color 0.2s ease;
+    }
+    
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    textarea.form-control {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      margin-top: 0.75rem;
+    }
+    
+    .checkbox-container input {
+      margin-right: 0.5rem;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: middle;
       cursor: pointer;
+      border: 1px solid transparent;
+      border-radius: 0.375rem;
+      transition: all 0.2s ease-in-out;
     }
-    button:hover {
-      background-color: #0056b3;
+    
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--white);
     }
-    #result img {
+    
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .btn-secondary {
+      background-color: var(--secondary);
+      color: var(--white);
+    }
+    
+    .btn-secondary:hover {
+      background-color: #4b5563;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.75rem;
+    }
+    
+    #loading {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid var(--primary);
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .result-title {
+      color: var(--dark);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .graph-container {
+      margin: 1.5rem 0;
+      text-align: center;
+    }
+    
+    .graph-container img {
       max-width: 100%;
       height: auto;
-      border: 1px solid #ccc;
+      border-radius: 0.375rem;
+      border: 1px solid var(--border);
+    }
+    
+    .result-section {
+      margin-bottom: 1.5rem;
+    }
+    
+    .result-list {
+      list-style-type: none;
+      margin: 0.75rem 0;
+    }
+    
+    .result-list li {
+      padding: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .result-list li:last-child {
+      border-bottom: none;
+    }
+    
+    .optimal {
+      font-weight: 600;
+      color: var(--success);
+    }
+    
+    pre {
+      background: #f1f3f5;
+      padding: 1rem;
+      border-radius: 0.375rem;
+      overflow-x: auto;
+      font-size: 0.875rem;
+      margin-top: 0.75rem;
+    }
+    
+    .status-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+    
+    .status-optimal {
+      background-color: rgba(5, 150, 105, 0.1);
+      color: var(--success);
+    }
+    
+    .status-infeasible {
+      background-color: rgba(220, 38, 38, 0.1);
+      color: var(--danger);
+    }
+    
+    .status-unbounded {
+      background-color: rgba(217, 119, 6, 0.1);
+      color: var(--warning);
+    }
+    
+    .alert {
+      padding: 1rem;
+      border-radius: 0.375rem;
+      margin-bottom: 1rem;
+    }
+    
+    .alert-danger {
+      background-color: rgba(220, 38, 38, 0.1);
+      color: var(--danger);
+      border-left: 4px solid var(--danger);
+    }
+
+    .tab-container {
       margin-top: 1rem;
     }
-    pre {
-      background: #eee;
-      padding: 0.5rem;
-      border-radius: 3px;
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .tab {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      margin-bottom: -1px;
+      font-weight: 500;
+    }
+    
+    .tab.active {
+      border: 1px solid var(--border);
+      border-bottom-color: var(--white);
+      border-top-left-radius: 0.25rem;
+      border-top-right-radius: 0.25rem;
+      color: var(--primary);
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      border-top: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+
+    .example-btn {
+      font-size: 0.875rem;
+      padding: 0.5rem 0.75rem;
+      margin-right: 0.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+
+    table th, table td {
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+
+    table th {
+      background-color: #f1f3f5;
+      font-weight: 600;
+    }
+
+    .matrix-cell {
+      text-align: center;
+    }
+
+    #helpModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+    }
+
+    .modal-content {
+      position: relative;
+      background-color: var(--white);
+      margin: 10% auto;
+      padding: 1.5rem;
+      width: 80%;
+      max-width: 700px;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .help-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .help-section h3 {
+      margin-bottom: 0.75rem;
+      color: var(--primary);
+    }
+
+    .tableau-container {
       overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    .tableau-table {
+      min-width: 100%;
+      border-collapse: collapse;
+    }
+
+    .tableau-table th, .tableau-table td {
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      text-align: right;
+    }
+
+    .tableau-table th {
+      background-color: #f1f3f5;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .tableau-variable {
+      font-style: italic;
+      font-weight: 600;
+    }
+
+    .debug-info {
+      background-color: #f8f9fa;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-top: 1rem;
+      font-family: monospace;
+      font-size: 0.875rem;
     }
   </style>
 </head>
 <body>
-  <h1>Programmation linéaire</h1>
-  <form id="lpForm">
-    <label for="objective">Objective Coefficients (comma-separated):</label>
-    <input type="text" id="objective" name="objective" placeholder="e.g. 3,5" required />
+  <div class="container">
+    <header>
+      <h1>Programmation Linéaire</h1>
+      <p class="subtitle">Résolution de problèmes d'optimisation linéaire par la méthode graphique ou du simplexe</p>
+    </header>
 
-    <label for="constraints">Constraint Matrix (each row on new line, comma-separated):</label>
-    <textarea id="constraints" name="constraints" rows="5" placeholder="e.g. 1,2&#10;3,4" required></textarea>
+    <div class="two-column">
+      <div>
+        <!-- Input Form -->
+        <div class="card">
+          <div class="card-header">Définition du problème</div>
+          <div class="card-body">
+            <div class="btn-group" style="margin-bottom: 1.5rem;">
+              <button class="btn btn-secondary example-btn" id="example1">Exemple 1</button>
+              <button class="btn btn-secondary example-btn" id="example2">Exemple 2</button>
+              <button class="btn btn-secondary" id="helpBtn">Aide</button>
+            </div>
 
-    <label for="rhs">RHS Values (comma-separated):</label>
-    <input type="text" id="rhs" name="rhs" placeholder="e.g. 5,11" required />
+            <form id="lpForm">
+              <div class="form-group">
+                <label class="form-label" for="objective">Coefficients de la fonction objectif:</label>
+                <input type="text" class="form-control" id="objective" name="objective" placeholder="ex: 3,5" required />
+                <small class="form-help">Entrez les coefficients séparés par des virgules (ex: pour 3x + 5y, entrez 3,5)</small>
+              </div>
 
-    <label for="variable_bounds">
-      Variable Bounds (optional, one per variable as lower-upper; use empty for no bound, separate bounds with commas):
-      <br /><small>Example: <code>0-,0-</code> means x ≥ 0 and y ≥ 0</small>
-    </label>
-    <input type="text" id="variable_bounds" name="variable_bounds" placeholder="e.g. 0-,0-" />
+              <div class="form-group">
+                <label class="form-label" for="constraints">Matrice des contraintes:</label>
+                <textarea class="form-control" id="constraints" name="constraints" rows="4" placeholder="ex: 1,2&#10;3,4" required></textarea>
+                <small class="form-help">Chaque ligne = une contrainte, coefficients séparés par des virgules</small>
+              </div>
 
-    <label for="method">Method:</label>
-    <select id="method" name="method">
-      <option value="graphique">Graphical</option>
-      <option value="simplexe">Simplex</option>
-    </select>
+              <div class="form-group">
+                <label class="form-label" for="rhs">Valeurs du côté droit (RHS):</label>
+                <input type="text" class="form-control" id="rhs" name="rhs" placeholder="ex: 5,11" required />
+                <small class="form-help">Valeurs après le signe ≤, séparées par des virgules</small>
+              </div>
 
-    <label for="maximize">Maximize:</label>
-    <input type="checkbox" id="maximize" name="maximize" checked />
+              <div class="form-group">
+                <label class="form-label" for="variable_bounds">Bornes des variables:</label>
+                <input type="text" class="form-control" id="variable_bounds" name="variable_bounds" placeholder="ex: 0-,0-" />
+                <small class="form-help">Format: min-max, séparées par des virgules (ex: 0-, signifie x ≥ 0)</small>
+              </div>
 
-    <button type="submit">Solve</button>
-  </form>
+              <div class="form-group">
+                <label class="form-label" for="method">Méthode de résolution:</label>
+                <select class="form-control" id="method" name="method">
+                  <option value="graphique">Méthode graphique (2 variables max)</option>
+                  <option value="simplexe">Méthode du simplexe</option>
+                </select>
+              </div>
 
-  <div id="result"></div>
+              <div class="checkbox-container">
+                <input type="checkbox" id="maximize" name="maximize" checked />
+                <label for="maximize">Maximiser la fonction objectif</label>
+              </div>
+
+              <div class="form-group" style="margin-top: 1.5rem;">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Résoudre</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <!-- Loading State -->
+        <div id="loading">
+          <div class="spinner"></div>
+          <p>Calcul en cours...</p>
+        </div>
+
+        <!-- Results Card -->
+        <div class="card" id="resultCard" style="display: none;">
+          <div class="card-header card-header-alt">Résultats</div>
+          <div class="card-body" id="result">
+            <!-- Results will be loaded here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Help Modal -->
+  <div id="helpModal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2 style="margin-bottom: 1rem; color: var(--primary);">Aide - Programmation Linéaire</h2>
+
+      <div class="help-section">
+        <h3>Structure d'un problème de programmation linéaire</h3>
+        <p>Un problème de programmation linéaire consiste à optimiser (maximiser ou minimiser) une fonction objectif linéaire sous un ensemble de contraintes également linéaires.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>Comment remplir le formulaire</h3>
+        <ul style="list-style-type: disc; padding-left: 2rem;">
+          <li><strong>Fonction objectif</strong>: Entrez les coefficients des variables, séparés par des virgules. Par exemple, pour la fonction <code>3x + 5y</code>, entrez <code>3,5</code>.</li>
+          <li><strong>Contraintes</strong>: Chaque ligne représente une contrainte. Les coefficients doivent être séparés par des virgules. Par exemple, pour les contraintes <code>x + 2y ≤ 10</code> et <code>3x + y ≤ 15</code>, entrez:<br><code>1,2</code><br><code>3,1</code></li>
+          <li><strong>RHS</strong>: Entrez les valeurs du côté droit des contraintes, séparées par des virgules. Pour l'exemple ci-dessus, entrez <code>10,15</code>.</li>
+          <li><strong>Bornes des variables</strong>: Le format est <code>min-max</code> pour chaque variable. Par exemple, <code>0-</code> signifie que la variable est supérieure ou égale à 0. Si vous laissez ce champ vide, les variables sont considérées comme non bornées.</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <h3>Méthodes de résolution</h3>
+        <ul style="list-style-type: disc; padding-left: 2rem;">
+          <li><strong>Méthode graphique</strong>: Applicable uniquement pour les problèmes à deux variables. Cette méthode dessine les contraintes et identifie la région faisable, puis détermine le point optimal.</li>
+          <li><strong>Méthode du simplexe</strong>: Algorithme itératif qui peut résoudre des problèmes avec un nombre arbitraire de variables et de contraintes.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
 
   <script>
-    document.getElementById('lpForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
-      
-      // Get input values
-      const objectiveInput = document.getElementById('objective').value;
-      const constraintsInput = document.getElementById('constraints').value;
-      const rhsInput = document.getElementById('rhs').value;
-      const boundsInput = document.getElementById('variable_bounds').value;
-      const method = document.getElementById('method').value;
-      const maximize = document.getElementById('maximize').checked;
-      
-      // Parse objective coefficients (e.g., "3,5")
-      const objectiveCoefficients = objectiveInput.split(',').map(Number);
-      
-      // Parse constraint matrix (each row is separated by a newline, columns by commas)
-      const constraintMatrix = constraintsInput.split('\n')
-        .filter(line => line.trim() !== "")
-        .map(line => line.split(',').map(Number));
-      
-      // Parse RHS values (e.g., "5,11")
-      const rhsValues = rhsInput.split(',').map(Number);
-      
-      // Parse variable bounds if provided (format: lower-upper, e.g., "0-,0-")
-      let variable_bounds = null;
-      if (boundsInput.trim() !== "") {
-        variable_bounds = boundsInput.split(',').map(function (boundStr) {
-          const parts = boundStr.split('-');
-          const lower = parts[0] === "" ? null : Number(parts[0]);
-          const upper = parts[1] === "" ? null : Number(parts[1]);
-          return [lower, upper];
-        });
-      }
-      
-      // Build the payload object
-      const payload = {
-        objective_coefficients: objectiveCoefficients,
-        constraint_matrix: constraintMatrix,
-        rhs_values: rhsValues,
-        variable_bounds: variable_bounds,
-        method: method,
-        maximize: maximize
+    document.addEventListener('DOMContentLoaded', () => {
+      // Modal functionality
+      const modal = document.getElementById('helpModal');
+      const helpBtn = document.getElementById('helpBtn');
+      const closeBtn = document.querySelector('.close-modal');
+
+      helpBtn.addEventListener('click', () => {
+        modal.style.display = 'block';
+      });
+
+      closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+      });
+
+      window.addEventListener('click', (event) => {
+        if (event.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+
+      // Example data
+      const examples = {
+        example1: {
+          objective: '3,5',
+          constraints: '1,2\n3,1',
+          rhs: '10,15',
+          variable_bounds: '0-,0-',
+          method: 'graphique',
+          maximize: true
+        },
+        example2: {
+          objective: '4,6',
+          constraints: '2,1\n1,1\n1,3',
+          rhs: '8,6,9',
+          variable_bounds: '0-,0-',
+          method: 'simplexe',
+          maximize: true
+        }
       };
-      
-      try {
-        const response = await fetch('/optimize', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-        
-        const resultDiv = document.getElementById('result');
-        if (!response.ok) {
-          const errorData = await response.json();
-          resultDiv.innerHTML = `<p style="color:red;">Error: ${errorData.detail}</p>`;
-          return;
-        }
-        
-        const data = await response.json();
-        let html = `<h2>Status: ${data.status}</h2>`;
-        
-        // For the graphical method, display plot and vertices if available
-        if (data.plot) {
-          html += `<h3>Plot:</h3>
-                   <img src="data:image/png;base64,${data.plot}" alt="Plot" />`;
-        }
-        
-        if (data.vertices) {
-          html += `<h3>Vertices:</h3>
-                   <ul>`;
-          data.vertices.forEach(vertex => {
-            html += `<li>x: ${vertex.x}, y: ${vertex.y}, Objective: ${vertex.objective_value}${vertex.is_optimal ? " (Optimal)" : ""}</li>`;
-          });
-          html += `</ul>`;
-        }
-        
-        // For the simplex method, display the solution and steps if available
-        if (data.solution) {
-          html += `<h3>Simplex Solution:</h3>
-                   <p>Variables: ${data.solution.variables.join(', ')}</p>
-                   <p>Optimal Value: ${data.solution.value}</p>`;
-        }
-        
-        if (data.steps) {
-          html += `<h3>Simplex Steps:</h3>`;
-          data.steps.forEach((step, index) => {
-            html += `<h4>Step ${index}</h4>
-                     <pre>${JSON.stringify(step.tableau, null, 2)}</pre>`;
-          });
-        }
-        
-        resultDiv.innerHTML = html;
-      } catch (error) {
-        console.error('Error:', error);
+
+      // Load examples
+      document.getElementById('example1').addEventListener('click', () => {
+        loadExample('example1');
+      });
+
+      document.getElementById('example2').addEventListener('click', () => {
+        loadExample('example2');
+      });
+
+      function loadExample(exampleId) {
+        const data = examples[exampleId];
+        document.getElementById('objective').value = data.objective;
+        document.getElementById('constraints').value = data.constraints;
+        document.getElementById('rhs').value = data.rhs;
+        document.getElementById('variable_bounds').value = data.variable_bounds;
+        document.getElementById('method').value = data.method;
+        document.getElementById('maximize').checked = data.maximize;
       }
+
+      // Form submission
+      document.getElementById('lpForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const loading = document.getElementById('loading');
+        const resultCard = document.getElementById('resultCard');
+        const resultDiv = document.getElementById('result');
+
+        // Show loading state
+        loading.style.display = 'block';
+        resultCard.style.display = 'none';
+
+        try {
+          // Validate inputs
+          const objective = document.getElementById('objective').value.split(',').map(Number);
+          const constraintRows = document.getElementById('constraints').value.trim().split('\n');
+          const constraintMatrix = constraintRows.map(row => row.split(',').map(Number));
+          const rhs = document.getElementById('rhs').value.split(',').map(Number);
+          
+          // Validate number of constraints matches RHS values
+          if (constraintMatrix.length !== rhs.length) {
+            throw new Error("Le nombre de contraintes et de valeurs RHS doit être identique.");
+          }
+          
+          // Validate all constraint rows have the same number of coefficients
+          const varCount = objective.length;
+          for (let i = 0; i < constraintMatrix.length; i++) {
+            if (constraintMatrix[i].length !== varCount) {
+              throw new Error(`La contrainte ${i+1} a ${constraintMatrix[i].length} coefficients, mais il devrait y en avoir ${varCount}.`);
+            }
+          }
+
+          // Check for invalid values
+          if (objective.some(isNaN)) {
+            throw new Error("Les coefficients de la fonction objectif doivent être des nombres.");
+          }
+          
+          if (constraintMatrix.some(row => row.some(isNaN))) {
+            throw new Error("Les coefficients des contraintes doivent être des nombres.");
+          }
+          
+          if (rhs.some(isNaN)) {
+            throw new Error("Les valeurs RHS doivent être des nombres.");
+          }
+
+          // Process variable bounds
+          let variableBounds = null;
+          const boundsString = document.getElementById('variable_bounds').value.trim();
+          
+          if (boundsString !== "") {
+            variableBounds = boundsString.split(',').map(bound => {
+              const [lower, upper] = bound.split('-');
+              return [
+                lower === "" ? null : Number(lower), 
+                upper === "" ? null : Number(upper)
+              ];
+            });
+          }
+
+          // Build payload
+          const payload = {
+            objective_coefficients: objective,
+            constraint_matrix: constraintMatrix,
+            rhs_values: rhs,
+            variable_bounds: variableBounds,
+            method: document.getElementById('method').value,
+            maximize: document.getElementById('maximize').checked
+          };
+
+          console.log("Sending payload:", payload);
+
+          const response = await fetch('/optimize', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || "Erreur de serveur");
+          }
+
+          const data = await response.json();
+          console.log("Received data:", data);
+          
+          // Build the result HTML based on which method was used
+          let html = '';
+          
+          if (data.status) {
+            let statusText = data.status;
+            let statusClass = 'status-optimal';
+            
+            if (data.status.toLowerCase() === 'optimal') {
+              statusText = 'Optimal';
+            } else if (data.status.toLowerCase().includes('infeasible') || data.status.toLowerCase().includes('no feasible')) {
+              statusText = 'Non réalisable';
+              statusClass = 'status-infeasible';
+            } else if (data.status.toLowerCase().includes('unbounded')) {
+              statusText = 'Non borné';
+              statusClass = 'status-unbounded';
+            }
+            
+            html += `<h2 class="result-title">Statut: 
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </h2>`;
+          }
+
+          // If graphical method was used
+          if (document.getElementById('method').value === 'graphique') {
+            // Plot
+            if (data.plot) {
+              html += `<div class="result-section">
+                        <h3>Représentation graphique</h3>
+                        <div class="graph-container">
+                          <img src="data:image/png;base64,${data.plot}" alt="Graphique de solution" />
+                        </div>
+                      </div>`;
+            }
+
+            // Vertices
+            if (data.vertices && data.vertices.length > 0) {
+              html += `<div class="result-section">
+                        <h3>Points caractéristiques</h3>
+                        <ul class="result-list">`;
+              
+              data.vertices.forEach(v => {
+                html += `<li ${v.is_optimal ? 'class="optimal"' : ''}>
+                          Point (${v.x.toFixed(2)}, ${v.y.toFixed(2)}) 
+                          - Valeur: ${v.objective_value.toFixed(2)}
+                          ${v.is_optimal ? ' (Optimal)' : ''}
+                        </li>`;
+              });
+              
+              html += `</ul></div>`;
+            }
+          }
+
+          // If simplex method was used
+          if (document.getElementById('method').value === 'simplexe') {
+            if (data.solution) {
+              html += `<div class="result-section">
+                        <h3>Solution</h3>
+                        <table>
+                          <tr>
+                            <th>Variables</th>
+                            <th>Valeur</th>
+                          </tr>`;
+              
+              data.solution.variables.forEach((value, index) => {
+                html += `<tr>
+                          <td>x<sub>${index + 1}</sub></td>
+                          <td>${value.toFixed(4)}</td>
+                        </tr>`;
+              });
+              
+              html += `<tr class="optimal">
+                        <td><strong>Valeur objectif</strong></td>
+                        <td><strong>${data.solution.value.toFixed(4)}</strong></td>
+                      </tr>
+                    </table>
+                  </div>`;
+
+              // Add tableau steps if available
+              if (data.steps && data.steps.length > 0) {
+                html += `<div class="tab-container">
+                          <div class="tabs">
+                            <div class="tab active" data-tab="summary">Résumé</div>
+                            <div class="tab" data-tab="steps">Étapes du simplexe</div>
+                          </div>
+                          
+                          <div class="tab-content active" id="summary">
+                            <p>Le problème a été résolu en ${data.steps.length} itérations.</p>
+                          </div>
+                          
+                          <div class="tab-content" id="steps">`;
+                
+                data.steps.forEach((step, i) => {
+                  html += `<h4>Itération ${i}</h4>`;
+                  
+                  if (step.tableau && Array.isArray(step.tableau)) {
+                    html += `<div class="tableau-container">
+                              <table class="tableau-table">`;
+                    
+                    step.tableau.forEach((row, rowIndex) => {
+                      html += `<tr>`;
+                      row.forEach((cell, cellIndex) => {
+                        if (rowIndex === 0 || cellIndex === 0) {
+                          html += `<th>${cell}</th>`;
+                        } else {
+                          // Highlight pivot element if available
+                          const isPivot = step.pivot_row === rowIndex && step.pivot_col === cellIndex;
+                          html += `<td ${isPivot ? 'style="background-color: #ffeb3b;"' : ''}>${cell}</td>`;
+                        }
+                      });
+                      html += `</tr>`;
+                    });
+                    
+                    html += `</table>
+                            </div>`;
+                  }
+                });
+                
+                html += `</div></div>`;
+              }
+            }
+          }
+
+          // Show the result
+          resultDiv.innerHTML = html;
+          resultCard.style.display = 'block';
+          
+          // Add tab functionality
+          document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+              const tabId = this.getAttribute('data-tab');
+              
+              // Remove active class from all tabs and contents
+              document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+              document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+              
+              // Add active class to clicked tab and corresponding content
+              this.classList.add('active');
+              document.getElementById(tabId).classList.add('active');
+            });
+          });
+
+        } catch (err) {
+          console.error("Error:", err);
+          resultDiv.innerHTML = `<div class="alert alert-danger">
+                                  <strong>Erreur:</strong> ${err.message || "Une erreur est survenue lors du traitement de votre demande."}
+                                </div>`;
+          resultCard.style.display = 'block';
+        } finally {
+          loading.style.display = 'none';
+          // Scroll to results
+          resultCard.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
     });
   </script>
 </body>
