@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Programmation Linéaire - Optimisation</title>
+  <title>Stadium Entrance Management System</title>
   <style>
     :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
+      --primary: #0f4c81;
+      --primary-dark: #0a3560;
       --secondary: #6b7280;
       --success: #059669;
       --danger: #dc2626;
@@ -121,7 +121,7 @@
     .form-control:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      box-shadow: 0 0 0 3px rgba(15, 76, 129, 0.1);
     }
     
     textarea.form-control {
@@ -421,67 +421,119 @@
       font-family: monospace;
       font-size: 0.875rem;
     }
+    
+    .stadium-info {
+      background-color: #edf2f7;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    .stadium-icon {
+      font-size: 2rem;
+      color: var(--primary);
+    }
+    
+    .stadium-details {
+      flex: 1;
+    }
+    
+    .stadium-name {
+      font-weight: 600;
+      font-size: 1.125rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .entrance-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .entrance-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .entrance-color {
+      width: 1rem;
+      height: 1rem;
+      border-radius: 50%;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>Programmation Linéaire</h1>
-      <p class="subtitle">Résolution de problèmes d'optimisation linéaire par la méthode graphique ou du simplexe</p>
+      <h1>Stadium Entrance Management System</h1>
+      <p class="subtitle">Optimize crowd flow and maximize safety at all stadium entrances</p>
     </header>
+
+    <div class="stadium-info">
+      <div class="stadium-icon">🏟️</div>
+      <div class="stadium-details">
+        <div class="stadium-name">City Arena Stadium</div>
+        <div>Expected attendance: 65,000 | Event: Championship Finals</div>
+      </div>
+    </div>
 
     <div class="two-column">
       <div>
         <!-- Input Form -->
         <div class="card">
-          <div class="card-header">Définition du problème</div>
+          <div class="card-header">Entrance Resource Allocation</div>
           <div class="card-body">
             <div class="btn-group" style="margin-bottom: 1.5rem;">
-              <button class="btn btn-secondary example-btn" id="example1">Exemple 1</button>
-              <button class="btn btn-secondary example-btn" id="example2">Exemple 2</button>
-              <button class="btn btn-secondary" id="helpBtn">Aide</button>
+              <button class="btn btn-secondary example-btn" id="example1">Weekday Setup</button>
+              <button class="btn btn-secondary example-btn" id="example2">Weekend Setup</button>
+              <button class="btn btn-secondary" id="helpBtn">Help</button>
             </div>
 
             <form id="lpForm">
               <div class="form-group">
-                <label class="form-label" for="objective">Coefficients de la fonction objectif:</label>
+                <label class="form-label" for="objective">Staff allocation weights per entrance:</label>
                 <input type="text" class="form-control" id="objective" name="objective" placeholder="ex: 3,5" required />
-                <small class="form-help">Entrez les coefficients séparés par des virgules (ex: pour 3x + 5y, entrez 3,5)</small>
+                <small class="form-help">Enter staff efficiency weights separated by commas (e.g.: for North=3, East=5, enter 3,5)</small>
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="constraints">Matrice des contraintes:</label>
+                <label class="form-label" for="constraints">Resource constraints matrix:</label>
                 <textarea class="form-control" id="constraints" name="constraints" rows="4" placeholder="ex: 1,2&#10;3,4" required></textarea>
-                <small class="form-help">Chaque ligne = une contrainte, coefficients séparés par des virgules</small>
+                <small class="form-help">Each row = one constraint, coefficients separated by commas</small>
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="rhs">Valeurs du côté droit (RHS):</label>
+                <label class="form-label" for="rhs">Available resources (RHS):</label>
                 <input type="text" class="form-control" id="rhs" name="rhs" placeholder="ex: 5,11" required />
-                <small class="form-help">Valeurs après le signe ≤, séparées par des virgules</small>
+                <small class="form-help">Maximum available resources, separated by commas</small>
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="variable_bounds">Bornes des variables:</label>
+                <label class="form-label" for="variable_bounds">Entrance capacity bounds:</label>
                 <input type="text" class="form-control" id="variable_bounds" name="variable_bounds" placeholder="ex: 0-,0-" />
-                <small class="form-help">Format: min-max, séparées par des virgules (ex: 0-, signifie x ≥ 0)</small>
+                <small class="form-help">Format: min-max, separated by commas (e.g.: 0-, means min capacity of 0)</small>
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="method">Méthode de résolution:</label>
+                <label class="form-label" for="method">Analysis method:</label>
                 <select class="form-control" id="method" name="method">
-                  <option value="graphique">Méthode graphique (2 variables max)</option>
-                  <option value="simplexe">Méthode du simplexe</option>
+                  <option value="graphique">Graphical method (2 entrances max)</option>
+                  <option value="simplexe">Simplex method (multiple entrances)</option>
                 </select>
               </div>
 
               <div class="checkbox-container">
                 <input type="checkbox" id="maximize" name="maximize" checked />
-                <label for="maximize">Maximiser la fonction objectif</label>
+                <label for="maximize">Maximize entrance efficiency</label>
               </div>
 
               <div class="form-group" style="margin-top: 1.5rem;">
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Résoudre</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Calculate Optimal Allocation</button>
               </div>
             </form>
           </div>
@@ -492,14 +544,69 @@
         <!-- Loading State -->
         <div id="loading">
           <div class="spinner"></div>
-          <p>Calcul en cours...</p>
+          <p>Calculating optimal configuration...</p>
         </div>
 
         <!-- Results Card -->
         <div class="card" id="resultCard" style="display: none;">
-          <div class="card-header card-header-alt">Résultats</div>
+          <div class="card-header card-header-alt">Optimization Results</div>
           <div class="card-body" id="result">
             <!-- Results will be loaded here -->
+          </div>
+        </div>
+        
+        <!-- Stadium Layout Card -->
+        <div class="card">
+          <div class="card-header">Stadium Entrance Layout</div>
+          <div class="card-body">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+              <svg width="300" height="200" viewBox="0 0 300 200">
+                <!-- Stadium outline -->
+                <ellipse cx="150" cy="100" rx="140" ry="80" fill="#f0f0f0" stroke="#666" stroke-width="2"/>
+                <ellipse cx="150" cy="100" rx="100" ry="50" fill="#daf1de" stroke="#666" stroke-width="1"/>
+                
+                <!-- Entrances -->
+                <rect x="145" y="20" width="10" height="15" fill="#e74c3c" stroke="#333"/>
+                <text x="150" y="15" text-anchor="middle" font-size="10">North</text>
+                
+                <rect x="145" y="165" width="10" height="15" fill="#3498db" stroke="#333"/>
+                <text x="150" y="195" text-anchor="middle" font-size="10">South</text>
+                
+                <rect x="270" y="95" width="15" height="10" fill="#f39c12" stroke="#333"/>
+                <text x="285" y="100" text-anchor="middle" font-size="10">East</text>
+                
+                <rect x="15" y="95" width="15" height="10" fill="#9b59b6" stroke="#333"/>
+                <text x="10" y="100" text-anchor="end" font-size="10">West</text>
+              </svg>
+              
+              <div class="entrance-legend">
+                <div class="entrance-item">
+                  <div class="entrance-color" style="background-color: #e74c3c;"></div>
+                  <span>North</span>
+                </div>
+                <div class="entrance-item">
+                  <div class="entrance-color" style="background-color: #3498db;"></div>
+                  <span>South</span>
+                </div>
+                <div class="entrance-item">
+                  <div class="entrance-color" style="background-color: #f39c12;"></div>
+                  <span>East</span>
+                </div>
+                <div class="entrance-item">
+                  <div class="entrance-color" style="background-color: #9b59b6;"></div>
+                  <span>West</span>
+                </div>
+              </div>
+            </div>
+            
+            <div style="font-size: 0.9rem;">
+              <p>Current status:</p>
+              <ul style="list-style-type: none; padding-left: 0.5rem; margin-top: 0.5rem;">
+                <li>✅ All entrances operational</li>
+                <li>⚠️ East entrance at 85% capacity</li>
+                <li>📊 Average processing time: 45 seconds per person</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -510,28 +617,28 @@
   <div id="helpModal">
     <div class="modal-content">
       <span class="close-modal">&times;</span>
-      <h2 style="margin-bottom: 1rem; color: var(--primary);">Aide - Programmation Linéaire</h2>
+      <h2 style="margin-bottom: 1rem; color: var(--primary);">Help - Stadium Entrance Management</h2>
 
       <div class="help-section">
-        <h3>Structure d'un problème de programmation linéaire</h3>
-        <p>Un problème de programmation linéaire consiste à optimiser (maximiser ou minimiser) une fonction objectif linéaire sous un ensemble de contraintes également linéaires.</p>
+        <h3>Understanding Entrance Resource Allocation</h3>
+        <p>This system helps optimize the distribution of staff, security equipment, and other resources across stadium entrances to maximize crowd flow efficiency while meeting safety requirements.</p>
       </div>
 
       <div class="help-section">
-        <h3>Comment remplir le formulaire</h3>
+        <h3>How to Fill Out the Form</h3>
         <ul style="list-style-type: disc; padding-left: 2rem;">
-          <li><strong>Fonction objectif</strong>: Entrez les coefficients des variables, séparés par des virgules. Par exemple, pour la fonction <code>3x + 5y</code>, entrez <code>3,5</code>.</li>
-          <li><strong>Contraintes</strong>: Chaque ligne représente une contrainte. Les coefficients doivent être séparés par des virgules. Par exemple, pour les contraintes <code>x + 2y ≤ 10</code> et <code>3x + y ≤ 15</code>, entrez:<br><code>1,2</code><br><code>3,1</code></li>
-          <li><strong>RHS</strong>: Entrez les valeurs du côté droit des contraintes, séparées par des virgules. Pour l'exemple ci-dessus, entrez <code>10,15</code>.</li>
-          <li><strong>Bornes des variables</strong>: Le format est <code>min-max</code> pour chaque variable. Par exemple, <code>0-</code> signifie que la variable est supérieure ou égale à 0. Si vous laissez ce champ vide, les variables sont considérées comme non bornées.</li>
+          <li><strong>Staff allocation weights</strong>: Enter the efficiency weights for each entrance, separated by commas. For example, for North and East entrances with weights 3 and 5, enter <code>3,5</code>.</li>
+          <li><strong>Resource constraints</strong>: Each line represents a constraint (e.g., staff, equipment). Enter coefficients separated by commas. For example, for constraints <code>1 staff + 2 equipment ≤ 10</code> and <code>3 staff + 1 equipment ≤ 15</code>, enter:<br><code>1,2</code><br><code>3,1</code></li>
+          <li><strong>Available resources</strong>: Enter the maximum available resources, separated by commas. For the example above, enter <code>10,15</code>.</li>
+          <li><strong>Entrance capacity bounds</strong>: The format is <code>min-max</code> for each entrance. For example, <code>0-</code> means the entrance must have at least 0 staff (can be unattended).</li>
         </ul>
       </div>
 
       <div class="help-section">
-        <h3>Méthodes de résolution</h3>
+        <h3>Analysis Methods</h3>
         <ul style="list-style-type: disc; padding-left: 2rem;">
-          <li><strong>Méthode graphique</strong>: Applicable uniquement pour les problèmes à deux variables. Cette méthode dessine les contraintes et identifie la région faisable, puis détermine le point optimal.</li>
-          <li><strong>Méthode du simplexe</strong>: Algorithme itératif qui peut résoudre des problèmes avec un nombre arbitraire de variables et de contraintes.</li>
+          <li><strong>Graphical method</strong>: Suitable for optimizing 2 entrances only. This provides a visual representation of the feasible region and identifies the optimal allocation point.</li>
+          <li><strong>Simplex method</strong>: Advanced algorithm that can optimize allocation across multiple entrances and complex constraints.</li>
         </ul>
       </div>
     </div>
@@ -618,28 +725,28 @@
           
           // Validate number of constraints matches RHS values
           if (constraintMatrix.length !== rhs.length) {
-            throw new Error("Le nombre de contraintes et de valeurs RHS doit être identique.");
+            throw new Error("The number of constraints must match the number of RHS values.");
           }
           
           // Validate all constraint rows have the same number of coefficients
           const varCount = objective.length;
           for (let i = 0; i < constraintMatrix.length; i++) {
             if (constraintMatrix[i].length !== varCount) {
-              throw new Error(`La contrainte ${i+1} a ${constraintMatrix[i].length} coefficients, mais il devrait y en avoir ${varCount}.`);
+              throw new Error(`Constraint ${i+1} has ${constraintMatrix[i].length} coefficients, but there should be ${varCount}.`);
             }
           }
 
           // Check for invalid values
           if (objective.some(isNaN)) {
-            throw new Error("Les coefficients de la fonction objectif doivent être des nombres.");
+            throw new Error("Staff allocation weights must be numbers.");
           }
           
           if (constraintMatrix.some(row => row.some(isNaN))) {
-            throw new Error("Les coefficients des contraintes doivent être des nombres.");
+            throw new Error("Resource constraint coefficients must be numbers.");
           }
           
           if (rhs.some(isNaN)) {
-            throw new Error("Les valeurs RHS doivent être des nombres.");
+            throw new Error("Available resource values must be numbers.");
           }
 
           // Process variable bounds
@@ -676,7 +783,7 @@
 
           if (!response.ok) {
             const error = await response.json();
-            throw new Error(error.detail || "Erreur de serveur");
+            throw new Error(error.detail || "Server error");
           }
 
           const data = await response.json();
@@ -692,14 +799,14 @@
             if (data.status.toLowerCase() === 'optimal') {
               statusText = 'Optimal';
             } else if (data.status.toLowerCase().includes('infeasible') || data.status.toLowerCase().includes('no feasible')) {
-              statusText = 'Non réalisable';
+              statusText = 'Not feasible';
               statusClass = 'status-infeasible';
             } else if (data.status.toLowerCase().includes('unbounded')) {
-              statusText = 'Non borné';
+              statusText = 'Unbounded';
               statusClass = 'status-unbounded';
             }
             
-            html += `<h2 class="result-title">Statut: 
+            html += `<h2 class="result-title">Status: 
                         <span class="status-badge ${statusClass}">${statusText}</span>
                     </h2>`;
           }
@@ -709,23 +816,25 @@
             // Plot
             if (data.plot) {
               html += `<div class="result-section">
-                        <h3>Représentation graphique</h3>
+                        <h3>Resource Allocation Graph</h3>
                         <div class="graph-container">
-                          <img src="data:image/png;base64,${data.plot}" alt="Graphique de solution" />
+                          <img src="data:image/png;base64,${data.plot}" alt="Entrance optimization graph" />
                         </div>
                       </div>`;
             }
 
-            // Vertices
+            // Vertices - now labeled as different staffing configurations
             if (data.vertices && data.vertices.length > 0) {
               html += `<div class="result-section">
-                        <h3>Points caractéristiques</h3>
+                        <h3>Staffing Configurations</h3>
                         <ul class="result-list">`;
+              
+              const entranceNames = ["North", "East"];
               
               data.vertices.forEach(v => {
                 html += `<li ${v.is_optimal ? 'class="optimal"' : ''}>
-                          Point (${v.x.toFixed(2)}, ${v.y.toFixed(2)}) 
-                          - Valeur: ${v.objective_value.toFixed(2)}
+                          Configuration: ${entranceNames[0]}=${v.x.toFixed(0)}, ${entranceNames[1]}=${v.y.toFixed(0)} 
+                          - Efficiency score: ${v.objective_value.toFixed(2)}
                           ${v.is_optimal ? ' (Optimal)' : ''}
                         </li>`;
               });
@@ -738,27 +847,28 @@
           if (document.getElementById('method').value === 'simplexe') {
             if (data.solution) {
               html += `<div class="result-section">
-                        <h3>Solution</h3>
+                        <h3>Optimal Staff Allocation</h3>
                         <table>
                           <tr>
-                            <th>Variables</th>
-                            <th>Valeur</th>
+                            <th>Entrance</th>
+                            <th>Staff Count</th>
                           </tr>`;
+              
+              const entranceNames = ["North", "East", "South", "West"];
               
               data.solution.variables.forEach((value, index) => {
                 html += `<tr>
-                          <td>x<sub>${index + 1}</sub></td>
-                          <td>${value.toFixed(4)}</td>
+                          <td>${index < entranceNames.length ? entranceNames[index] : `Entrance ${index + 1}`}</td>
+                          <td>${Math.round(value)}</td>
                         </tr>`;
               });
               
               html += `<tr class="optimal">
-                        <td><strong>Valeur objectif</strong></td>
-                        <td><strong>${data.solution.value.toFixed(4)}</strong></td>
+                        <td><strong>Total Efficiency Score</strong></td>
+                        <td><strong>${data.solution.value.toFixed(2)}</strong></td>
                       </tr>
                     </table>
                   </div>`;
-
               // Add tableau steps if available
               if (data.steps && data.steps.length > 0) {
                 html += `<div class="tab-container">
